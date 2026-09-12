@@ -1,0 +1,129 @@
+.create-repo-page {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 20px;
+  background: #0d1117;
+}
+
+.create-repo-card {
+  width: 100%;
+  max-width: 720px;
+  padding: 32px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  color: #f0f6fc;
+}
+
+.create-repo-card h1 {
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.create-repo-subtitle {
+  margin-bottom: 28px;
+  color: #8b949e;
+}
+
+.create-repo-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.create-repo-card label {
+  font-weight: 600;
+}
+
+.create-repo-card input[type="text"],
+.create-repo-card textarea {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #0d1117;
+  color: #f0f6fc;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.create-repo-card textarea {
+  resize: vertical;
+}
+
+.visibility-section {
+  margin-top: 10px;
+}
+
+.visibility-options {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.visibility-options label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 400;
+}
+
+.create-repo-error {
+  color: #f85149;
+  margin-top: 4px;
+}
+
+.create-repo-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.create-btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  background: transparent;
+  color: #f0f6fc;
+}
+
+.create-btn {
+  background: #238636;
+  color: white;
+  border-color: #238636;
+}
+
+.create-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-repo-card {
+  position: relative;
+  z-index: 10;
+}
+
+.create-repo-actions {
+  position: relative;
+  z-index: 20;
+}
+
+.create-btn,
+.cancel-btn {
+  position: relative;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.create-btn {
+  cursor: pointer;
+}

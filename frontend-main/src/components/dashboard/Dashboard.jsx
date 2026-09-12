@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./dashboard.css";
 import Navbar from "../Navbar";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+
 const Dashboard = () => {
   const [repositories, setRepositories] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,26 +13,44 @@ const Dashboard = () => {
   useEffect(() => {
     const userId = localStorage.getItem("userId");
 
+    if (!userId) {
+      console.error("User ID not found.");
+      return;
+    }
+
     const fetchRepositories = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3002/repo/user/${userId}`
+          `${API_URL}/repo/user/${userId}`
         );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
         const data = await response.json();
-        setRepositories(data.repositories);
+
+        setRepositories(data.repositories || []);
       } catch (err) {
-        console.error("Error while fecthing repositories: ", err);
+        console.error("Error while fetching repositories:", err);
+        setRepositories([]);
       }
     };
 
     const fetchSuggestedRepositories = async () => {
       try {
-        const response = await fetch(`http://localhost:3002/repo/all`);
+        const response = await fetch(`${API_URL}/repo/all`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
         const data = await response.json();
-        setSuggestedRepositories(data);
-        console.log(suggestedRepositories);
+
+        setSuggestedRepositories(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Error while fecthing repositories: ", err);
+        console.error("Error while fetching suggested repositories:", err);
+        setSuggestedRepositories([]);
       }
     };
 
@@ -39,12 +59,13 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery == "") {
+    if (searchQuery.trim() === "") {
       setSearchResults(repositories);
     } else {
       const filteredRepo = repositories.filter((repo) =>
-        repo.name.toLowerCase().includes(searchQuery.toLowerCase())
+        repo.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
+
       setSearchResults(filteredRepo);
     }
   }, [searchQuery, repositories]);
@@ -52,20 +73,26 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
+
       <section id="dashboard">
         <aside>
           <h3>Suggested Repositories</h3>
-          {suggestedRepositories.map((repo) => {
-            return (
+
+          {suggestedRepositories.length === 0 ? (
+            <p>No repositories available.</p>
+          ) : (
+            suggestedRepositories.map((repo) => (
               <div key={repo._id}>
                 <h4>{repo.name}</h4>
-                <h4>{repo.description}</h4>
+                <p>{repo.description || "No description"}</p>
               </div>
-            );
-          })}
+            ))
+          )}
         </aside>
+
         <main>
           <h2>Your Repositories</h2>
+
           <div id="search">
             <input
               type="text"
@@ -74,17 +101,22 @@ const Dashboard = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {searchResults.map((repo) => {
-            return (
+
+          {searchResults.length === 0 ? (
+            <p>No repositories found.</p>
+          ) : (
+            searchResults.map((repo) => (
               <div key={repo._id}>
                 <h4>{repo.name}</h4>
-                <h4>{repo.description}</h4>
+                <p>{repo.description || "No description"}</p>
               </div>
-            );
-          })}
+            ))
+          )}
         </main>
+
         <aside>
           <h3>Upcoming Events</h3>
+
           <ul>
             <li>
               <p>Tech Conference - Dec 15</p>

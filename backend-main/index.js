@@ -68,27 +68,42 @@ yargs(hideBin(process.argv))
   )
   .demandCommand(1, "You need at least one command")
   .help().argv;
-
-function startServer() {
+async function startServer() {
   const app = express();
   const port = process.env.PORT || 3000;
 
   app.use(bodyParser.json());
   app.use(express.json());
 
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    })
+  );
+
   const mongoURI = process.env.MONGODB_URI;
 
-  mongoose
-    .connect(mongoURI)
-    .then(() => console.log("MongoDB connected!"))
-    .catch((err) => console.error("Unable to connect : ", err));
+  if (!mongoURI) {
+    console.error("MONGODB_URI is not defined in environment variables.");
+    process.exit(1);
+  }
 
-  app.use(cors({ origin: "*" }));
+  try {
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log("MongoDB connected!");
+  } catch (err) {
+    console.error("Unable to connect to MongoDB:", err.message);
+    process.exit(1);
+  }
 
   app.use("/", mainRouter);
 
-  let user = "test";
   const httpServer = http.createServer(app);
+
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -98,19 +113,21 @@ function startServer() {
 
   io.on("connection", (socket) => {
     socket.on("joinRoom", (userID) => {
-      user = userID;
-      console.log("=====");
-      console.log(user);
-      console.log("=====");
+      console.log("User joined room:", userID);
       socket.join(userID);
     });
   });
 
-  const db = mongoose.connection;
-
-  db.once("open", async () => {
+  mongoose.connection.once("open", () => {
     console.log("CRUD operations called");
-    // CRUD operations
+  });
+
+  mongoose.connection.on("error", (err) => {
+    console.error("MongoDB connection error:", err.message);
+  });
+
+  mongoose.connection.on("disconnected", () => {
+    console.log("MongoDB disconnected.");
   });
 
   httpServer.listen(port, () => {

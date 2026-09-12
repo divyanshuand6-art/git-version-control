@@ -10,6 +10,8 @@ import Signup from "./components/auth/Signup";
 // Auth Context
 import { useAuth } from "./authContext";
 
+import CreateRepository from "./components/repo/CreateRepository";
+
 const ProjectRoutes = ()=>{
     const {currentUser, setCurrentUser} = useAuth();
     const navigate = useNavigate();
@@ -47,7 +49,10 @@ const ProjectRoutes = ()=>{
         {
             path:"/profile",
             element:<Profile/>
-        }
+        },{
+  path: "/create",
+  element: <CreateRepository />,
+},
     ]);
 
     return element;

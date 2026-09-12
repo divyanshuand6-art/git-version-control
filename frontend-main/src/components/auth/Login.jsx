@@ -8,6 +8,7 @@ import "./auth.css";
 
 import logo from "../../assets/github-mark-white.svg";
 import { Link } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
 
 const Login = () => {
   // useEffect(() => {
@@ -26,8 +27,7 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:3002/login", {
-        email: email,
+const res = await axios.post(`${API_URL}/login`, {        email: email,
         password: password,
       });
 

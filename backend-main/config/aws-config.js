@@ -1,11 +1,13 @@
-const AWS = require("aws-sdk");
+const { S3Client } = require("@aws-sdk/client-s3");
 
-AWS.config.update({
-  region: "eu-north-1"
+const s3 = new S3Client({
+  region: process.env.AWS_REGION || "eu-north-1",
 });
 
-const s3 = new AWS.S3();
+const S3_BUCKET = process.env.S3_BUCKET;
 
-const S3_BUCKET = "dsd05bucket";
+if (!S3_BUCKET) {
+  console.warn("S3_BUCKET is not defined in environment variables.");
+}
 
 module.exports = { s3, S3_BUCKET };

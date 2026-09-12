@@ -45,12 +45,18 @@ async function signup(req, res) {
 
     const result = await usersCollection.insertOne(newUser);
 
-    const token = jwt.sign(
-      { id: result.insertId },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-    res.json({ token, userId: result.insertId });
+const userId = result.insertedId.toString();
+
+const token = jwt.sign(
+  { id: userId },
+  process.env.JWT_SECRET_KEY,
+  { expiresIn: "1h" }
+);
+
+res.json({
+  token,
+  userId,
+});
   } catch (err) {
     console.error("Error during signup : ", err.message);
     res.status(500).send("Server error");
@@ -74,10 +80,20 @@ async function login(req, res) {
       return res.status(400).json({ message: "Invalid credentials!" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1h",
-    });
-    res.json({ token, userId: user._id });
+   const userId = user._id.toString();
+
+const token = jwt.sign(
+  { id: userId },
+  process.env.JWT_SECRET_KEY,
+  {
+    expiresIn: "1h",
+  }
+);
+
+res.json({
+  token,
+  userId,
+});
   } catch (err) {
     console.error("Error during login : ", err.message);
     res.status(500).send("Server error!");
@@ -144,11 +160,11 @@ async function updateUserProfile(req, res) {
       { $set: updateFields },
       { returnDocument: "after" }
     );
-    if (!result.value) {
-      return res.status(404).json({ message: "User not found!" });
-    }
+   if (!result) {
+  return res.status(404).json({ message: "User not found!" });
+}
 
-    res.send(result.value);
+res.send(result);
   } catch (err) {
     console.error("Error during updating : ", err.message);
     res.status(500).send("Server error!");
@@ -167,8 +183,8 @@ async function deleteUserProfile(req, res) {
       _id: new ObjectId(currentID),
     });
 
-    if (result.deleteCount == 0) {
-      return res.status(404).json({ message: "User not found!" });
+if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "User not found!" });
     }
 
     res.json({ message: "User Profile Deleted!" });
